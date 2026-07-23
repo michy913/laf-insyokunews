@@ -238,6 +238,9 @@ mark{background:#FFE58A;color:var(--tx);border-radius:2px;padding:0 2px}
 .spin-msg{font-size:21px;color:var(--txm)}
 .spin-step{font-size:17px;color:var(--or);margin-top:9px}
 .footer{padding:16px 26px;border-top:1px solid var(--bd);font-size:14px;color:var(--txl);text-align:center}
+/* 閲覧専用モード（Cowork外／Netlify公開版）ではAI生成・質問UIを隠す */
+body.standalone .sb-foot{display:none}
+body.standalone .bottom-bar{display:none}
 </style>
 </head>
 <body>
@@ -927,19 +930,29 @@ ${cnCombined}
 }
 
 (function(){
-  // スケジュールタスクが埋め込んだ週次データを先にlocalStorageへ注入
+  // Cowork（編集・生成環境）かどうかを判定。
+  // Netlify等の静的公開版（社員閲覧用）では window.cowork が無く、AI生成は行わない＝閲覧専用。
+  const IS_COWORK = !!(window.cowork && (typeof window.cowork.askClaude==='function' || typeof window.cowork.callMcpTool==='function'));
+  if(!IS_COWORK) document.body.classList.add('standalone');
+
+  // スケジュールタスクが埋め込んだ号データを先にlocalStorageへ注入
   if(WEEKLY_ISSUE_DATA && WEEKLY_ISSUE_DATA.date){
     if(!load().find(x=>x.date===WEEKLY_ISSUE_DATA.date)){
       upsert(WEEKLY_ISSUE_DATA);
-      console.log('[Newsletter] 週次自動生成データを読み込みました:', WEEKLY_ISSUE_DATA.date);
+      console.log('[Newsletter] 自動生成データを読み込みました:', WEEKLY_ISSUE_DATA.date);
     }
   }
   const list=load();renderSidebar();
   const today=todayStr();
   if(list.length){activeDate=list[0].date;renderSidebar();showIssue(list[0].date);}
-  // 今週の号がなければ自動生成を試みる（スケジュールタスク未実行時のフォールバック）
-  if(!list.find(x=>x.date===today)){
-    setTimeout(()=>generateToday(),400);
+  if(IS_COWORK){
+    // 編集環境でのみ、今日の号が無ければ自動生成（スケジュールタスク未実行時のフォールバック）
+    if(!list.find(x=>x.date===today)){
+      setTimeout(()=>generateToday(),400);
+    }
+  } else if(!list.length){
+    // 閲覧専用版でまだ号が無い場合の案内（自動生成はしない）
+    document.getElementById('mn').innerHTML='<div class="s-empty"><div class="s-icon">🍜</div><div class="s-title">まもなく最新号が表示されます</div><div class="s-desc">次回の自動更新（毎週 月曜・水曜）で最新のニュースレターがここに表示されます。</div></div>';
   }
 })();
 </script>
