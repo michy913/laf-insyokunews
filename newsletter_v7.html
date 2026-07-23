@@ -637,15 +637,15 @@ async function generateToday(){
   try{
     const sr=await window.cowork.callMcpTool(
       'mcp__cfba6524-a79c-4d25-9a05-0b69f8f9ac1e__web_search_exa',
-      {query:`飲食業界 チェーン店 最新ニュース M&A 出店 閉店 撤退 人事異動 ${today}`, numResults:8}
+      {query:`飲食業界 チェーン店 最新ニュース M&A 出店 閉店 撤退 人事異動 ${today}`, numResults:16}
     );
-    if(!sr.isError) rawNewsText=toStr(sr.content).slice(0,3500);
+    if(!sr.isError) rawNewsText=toStr(sr.content).slice(0,7000);
   }catch(e){console.warn('Exa news search',e);}
 
   setStep('① ニュースを整形中...');
   try{
     const prompt=rawNewsText
-      ?`以下の実際のニュースから5件選び、出典情報を含めたJSONの配列のみ出力してください。
+      ?`以下の実際のニュースから10件選び、出典情報を含めたJSONの配列のみ出力してください。
 
 【Web検索結果（${today}）】
 ${rawNewsText}
@@ -654,13 +654,14 @@ ${rawNewsText}
 [{"tag":"M&A","headline":"モスフードサービスがBYOを112億円で子会社化","body":"モスフードサービスはBYO（おぼんdeごはん・和食酒えん運営）を約112億円で取得。健康志向の和食業態を新たな事業の柱とし、FCノウハウで新規出店を推進する","scale":"大手","source":"時事通信","url":"https://www.jiji.com/...","date":"2026-06-30"}]
 
 ルール：
-1. 大手3件(scale:大手)・中小2件(scale:中小)
+1. 大手5件(scale:大手)・中小5件(scale:中小)の合計10件
 2. tagはM&A/出店/撤退/人事異動/業態転換/トレンドのいずれか
 3. sourceは記事の媒体名、urlは記事の実際のURL（検索結果にあるもの）、dateはYYYY-MM-DD形式
-4. 事実に基づいた内容のみ。JSONの配列のみ返すこと`
-      :`飲食業界ニュース5件をJSONの配列のみで出力（Web検索不可のためAI知識で生成）。
+4. 事実に基づいた内容のみ。検索結果から10件に満たない場合は取れるだけ出すこと
+5. JSONの配列のみ返すこと`
+      :`飲食業界ニュース10件をJSONの配列のみで出力（Web検索不可のためAI知識で生成）。
 [{"tag":"M&A","headline":"見出し","body":"詳細","scale":"大手","source":"日経MJ（AI生成）","url":"","date":"${today}"}]
-大手3件・中小2件。具体社名必須。JSONの配列のみ返すこと`;
+大手5件・中小5件の合計10件。具体社名必須。JSONの配列のみ返すこと`;
     const r=await window.cowork.askClaude(prompt,[]);
     const d=parseJSON(toStr(r));
     if(Array.isArray(d)&&d.length>0) newsItems=d;
@@ -740,42 +741,60 @@ JSONオブジェクトのみ返すこと`,[]);
   }catch(e){console.warn('③prop error',e);}
 
   /* ④ ラフテルズ顧問先ニュース */
-  setStep('④ ラフテルズ顧問先ニュースを検索中...');
+  setStep('④ 顧問先の新店・閉店・M&A・取り組みを徹底検索中...');
   try{
     // ラフテルズHPから顧問先情報を取得
     let clientNames='LH株式会社 OR 株式会社ワールドセンス';
     try{
       const lpR=await window.cowork.callMcpTool(
         'mcp__cfba6524-a79c-4d25-9a05-0b69f8f9ac1e__web_fetch_exa',
-        {urls:['https://laftels.com/news/','https://laftels.com/'],maxCharacters:2000}
+        {urls:['https://laftels.com/news/','https://laftels.com/works/','https://laftels.com/case/','https://laftels.com/'],maxCharacters:5000}
       );
       if(!lpR.isError){
         const lpText=toStr(lpR.content);
         // 株式会社〜 / 合同会社〜 など会社名を抽出
         const companyMatches=lpText.match(/(?:株式会社|合同会社|有限会社|一般社団法人)[぀-鿿゠-ヿa-zA-Z0-9&．・]+/g)||[];
-        const unique=[...new Set(companyMatches)].slice(0,5);
+        const unique=[...new Set(companyMatches)].slice(0,12);
         if(unique.length) clientNames=unique.join(' OR ');
       }
     }catch(e){console.warn('laftels hp',e);}
 
-    // 顧問先ニュースを検索
-    const cnR=await window.cowork.callMcpTool(
-      'mcp__cfba6524-a79c-4d25-9a05-0b69f8f9ac1e__web_search_exa',
-      {query:`${clientNames} 飲食 ニュース 最新情報 ${today}`,numResults:5}
-    );
-    if(!cnR.isError){
-      const cnText=toStr(cnR.content).slice(0,2500);
+    // 顧問先ニュースを複数の切り口で徹底検索（新店オープン/閉店/M&A/取り組み）
+    const clientQueries=[
+      `${clientNames} 新店 オープン 開店 出店`,
+      `${clientNames} 閉店 撤退 リニューアル`,
+      `${clientNames} M&A 買収 資本提携 業務提携`,
+      `${clientNames} 新商品 新業態 取り組み キャンペーン 受賞 プレスリリース`,
+      `${clientNames} 飲食 ニュース 最新情報 ${today}`
+    ];
+    let cnCombined='';
+    for(const q of clientQueries){
+      try{
+        const cnR=await window.cowork.callMcpTool(
+          'mcp__cfba6524-a79c-4d25-9a05-0b69f8f9ac1e__web_search_exa',
+          {query:q,numResults:6}
+        );
+        if(!cnR.isError) cnCombined+='\n'+toStr(cnR.content);
+      }catch(e){console.warn('④client search',q,e);}
+    }
+    cnCombined=cnCombined.slice(0,7000);
+    if(cnCombined.trim()){
       const r=await window.cowork.askClaude(
-`ラフテルズの顧問先企業に関するニュースを以下の検索結果から抽出し、JSONの配列のみで出力してください。
+`ラフテルズの顧問先企業に関するニュースを以下の検索結果から「漏れなく徹底的に」抽出し、JSONの配列のみで出力してください。
 ラフテルズ既知の顧問先：LH株式会社、株式会社ワールドセンス
+（HPから取得した顧問先候補：${clientNames}）
 
 【検索結果】
-${cnText}
+${cnCombined}
 
 [{"company":"会社名","headline":"見出し25字以内","body":"詳細80〜120字","source":"出典メディア","url":"https://出典URL","date":"YYYY-MM-DD"}]
 
-・顧問先らしき企業の情報のみ抽出する
-・情報が見つからない場合は空配列 [] を返すこと
+抽出ルール：
+・特に「新店オープン・開店・出店」「閉店・撤退」「M&A・買収・提携」「新業態・新商品・取り組み・受賞」に該当する動きは1件も見逃さず拾う
+・上記顧問先企業（またはその運営ブランド・店舗）に関係する情報のみ。無関係な同名他社は除外する
+・重複する内容は1件にまとめる。該当が多い場合は最大8件まで、新しい日付順に並べる
+・各件に必ず正しいurlとdate(YYYY-MM-DD)を付ける。dateが不明な記事は含めない
+・本当に該当情報が1件も無い場合のみ空配列 [] を返す
 ・JSONの配列のみ返すこと`,[]);
       const d=parseJSON(toStr(r));
       if(Array.isArray(d)) clientNews=d;
