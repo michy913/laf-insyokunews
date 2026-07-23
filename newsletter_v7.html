@@ -292,13 +292,81 @@ const KEY='hr_nl_v7';
 // ━━ WEEKLY ISSUE DATA — スケジュールタスクが自動更新。手動編集禁止 ━━
 const WEEKLY_ISSUE_DATA = null; // AUTO-UPDATED BY SCHEDULED TASK
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// ━━ 顧問先リスト（Section ④の検索対象）━━
+// ━━ 顧問先リスト（Section ④の検索対象 ＝ 現クライアント71社）━━
 // laftels.com/client/ はロゴ画像で会社名を自動取得できないため、ここで管理する。
-// 追記形式：「株式会社◯◯」または「株式会社◯◯（運営ブランド名）」。増減自由。
+// 追記/削除自由。契約状況が変わったらこの配列を更新する。
 const CLIENT_COMPANIES = [
+  'Captain In Japan株式会社',
   'LH株式会社',
-  '株式会社ワールドセンス'
-  // ← ここに顧問先企業を追加していく
+  'PT.Astowa Food Indonesia',
+  'reor株式会社',
+  'UPSTART TOKYO株式会社',
+  'アクトダイニング株式会社',
+  '株式会社Bプラス',
+  '株式会社CCC',
+  '株式会社Dots company',
+  '株式会社KTS',
+  '株式会社KURIMARO',
+  '株式会社M\'H',
+  '株式会社QRAUD',
+  '株式会社Sunrise',
+  '株式会社兎食堂',
+  '株式会社魚貫',
+  '株式会社ストロングスタイル',
+  '株式会社大東ミラク',
+  '株式会社ともす',
+  '株式会社ハカタネクスト',
+  '株式会社ビックアーム',
+  '株式会社フィプロ',
+  '株式会社フードサービスもとぶ',
+  '株式会社本家あべや',
+  '株式会社楽company',
+  'ごちそうさま株式会社',
+  'スター食堂株式会社',
+  'ソルト・コンソーシアム株式会社',
+  'フードブランディング株式会社',
+  '麺屋ようすけ株式会社',
+  '株式会社 Fecos Creation',
+  '株式会社Buzz Foods',
+  '株式会社FS.shake',
+  '株式会社Gigac',
+  '株式会社Grant',
+  '株式会社INGS',
+  '株式会社JIS',
+  '株式会社KIMIYU Global',
+  '株式会社NO\'s',
+  '株式会社Quinci',
+  '株式会社REGS',
+  '株式会社serious',
+  '株式会社shioriya',
+  '株式会社TayaFoodService',
+  '株式会社TSUJIYA GROOVE',
+  '株式会社Tune up',
+  '株式会社ZOT',
+  '株式会社アントレスト',
+  '株式会社イートジョイ・フードサービス',
+  '株式会社ウインズジャパンホールディングス',
+  '株式会社エース',
+  '株式会社エフリード',
+  '株式会社オーゼットカンパニー',
+  '株式会社きんざん',
+  '株式会社くりこ',
+  '株式会社ココロオドル',
+  '株式会社サンドライブ',
+  '株式会社ニュールック（NLフーズ株式会社）',
+  '株式会社ネクストグローバルフーズ',
+  '株式会社ファイブファミリー',
+  '株式会社みやび屋',
+  '株式会社ユウケイ',
+  '株式会社レストランバンク',
+  '株式会社ワールドセンス',
+  '株式会社喜助',
+  '株式会社元気ファクトリー',
+  '株式会社登坂',
+  '株式会社鳳凰',
+  '有限会社ソフトライン',
+  '有限会社山田',
+  '有限会社野村興業'
 ];
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 let activeDate=null, generating=false, searchQuery='';
@@ -771,9 +839,10 @@ JSONオブジェクトのみ返すこと`,[]);
     // 1回の検索クエリが長くなりすぎないよう、社名は12件ずつのグループに分けてOR検索
     const nameGroups=[];
     for(let i=0;i<searchNames.length;i+=12) nameGroups.push(searchNames.slice(i,i+12).join(' OR '));
-    // 顧問先が多い場合はグループごとに、新店/閉店/M&A/取り組みの4カテゴリ＋一般で徹底検索
-    // 検索回数の暴発を防ぐため、社名グループは最大3つ（=最大36社）までを対象にする
-    const targetGroups=(nameGroups.length?nameGroups:[CLIENT_COMPANIES.join(' OR ')]).slice(0,3);
+    // 顧問先が多いのでグループ（12社ずつのOR検索）ごとに、
+    // 新店/閉店/M&A/取り組みの4カテゴリで徹底検索する。
+    // 71社なら約6グループ×4カテゴリ=約24検索。暴発防止に最大8グループまで。
+    const targetGroups=(nameGroups.length?nameGroups:[CLIENT_COMPANIES.join(' OR ')]).slice(0,8);
     const categories=[
       '新店 オープン 開店 出店',
       '閉店 撤退 リニューアル',
@@ -788,11 +857,12 @@ JSONオブジェクトのみ返すこと`,[]);
             'mcp__cfba6524-a79c-4d25-9a05-0b69f8f9ac1e__web_search_exa',
             {query:`${g} ${cat}`,numResults:6}
           );
-          if(!cnR.isError) cnCombined+='\n'+toStr(cnR.content);
+          // 各検索の寄与を上限つきで加算し、後半グループの結果が切り捨てられないようにする
+          if(!cnR.isError) cnCombined+='\n'+toStr(cnR.content).slice(0,900);
         }catch(e){console.warn('④client search',cat,e);}
       }
     }
-    cnCombined=cnCombined.slice(0,9000);
+    cnCombined=cnCombined.slice(0,20000);
     if(cnCombined.trim()){
       const r=await window.cowork.askClaude(
 `ラフテルズの顧問先企業に関するニュースを以下の検索結果から「漏れなく徹底的に」抽出し、JSONの配列のみで出力してください。
@@ -806,7 +876,7 @@ ${cnCombined}
 抽出ルール：
 ・特に「新店オープン・開店・出店」「閉店・撤退」「M&A・買収・提携」「新業態・新商品・取り組み・受賞」に該当する動きは1件も見逃さず拾う
 ・上記顧問先企業（またはその運営ブランド・店舗）に関係する情報のみ。無関係な同名他社は除外する
-・重複する内容は1件にまとめる。該当が多い場合は最大8件まで、新しい日付順に並べる
+・重複する内容は1件にまとめる。該当が多い場合は最大15件まで、新しい日付順に並べる
 ・各件に必ず正しいurlとdate(YYYY-MM-DD)を付ける。dateが不明な記事は含めない
 ・本当に該当情報が1件も無い場合のみ空配列 [] を返す
 ・JSONの配列のみ返すこと`,[]);
