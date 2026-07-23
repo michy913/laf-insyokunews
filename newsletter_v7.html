@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>飲食・人事 デイリーニュースレター</title>
+<style>
+:root{
+  color-scheme:light;
+  --or:#FF7A00;--orl:#FFF3E8;--orm:#FFD4A0;--ord:#CC5500;--ordd:#8B3A00;
+  --tx:#1A1A1A;--txm:#555;--txl:#888;--bg:#F2F2F7;--wh:#FFF;--bd:#E0E0E0;
+  --blue:#2563EB;--bluel:#EFF6FF;--green:#16A34A;--greenl:#F0FDF4;
+  --red:#DC2626;--redl:#FEF2F2;--purple:#7C3AED;--purplel:#F5F3FF;
+  --navy:#1E1B4B;--teal:#0D9488;--teall:#F0FDFA;
+  --ice:#0EA5E9;--icel:#F0F9FF;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Sans','Yu Gothic UI','Meiryo',sans-serif;background:var(--bg);color:var(--tx);line-height:1.65;font-size:21px}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* ── Sidebar ── */
+.sb{width:220px;background:var(--ordd);color:#fff;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.sb-brand{padding:18px 14px 13px;background:rgba(0,0,0,.2)}
+.sb-logo{font-size:19px;font-weight:900;letter-spacing:.5px}
+.sb-sub{font-size:13px;opacity:.7;margin-top:3px}
+.sb-search{padding:9px 10px;background:rgba(0,0,0,.15)}
+.sb-search-box{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.15);border-radius:8px;padding:7px 11px}
+.sb-search-icon{font-size:14px;opacity:.7;flex-shrink:0}
+.sb-search-input{background:none;border:none;outline:none;color:#fff;font-size:14px;width:100%;font-family:inherit}
+.sb-search-input::placeholder{color:rgba(255,255,255,.5)}
+.sb-search-clear{background:none;border:none;color:rgba(255,255,255,.6);cursor:pointer;font-size:16px;padding:0;flex-shrink:0;display:none}
+.sb-list{flex:1;overflow-y:auto;padding:5px 0}
+.sb-item{padding:10px 13px;cursor:pointer;border-left:3px solid transparent;font-size:13px;transition:background .1s}
+.sb-item:hover{background:rgba(255,255,255,.1)}
+.sb-item.on{background:rgba(255,255,255,.18);border-left-color:#FFD4A0}
+.sb-item.sh{border-left-color:#FFD4A0;background:rgba(255,255,255,.1)}
+.sb-idate{font-weight:bold;font-size:13px}
+.sb-inum{font-size:11px;opacity:.6;margin-top:1px}
+.sb-match{font-size:11px;opacity:.55;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-none{padding:14px;font-size:13px;opacity:.55;text-align:center}
+.sb-foot{padding:9px 10px 13px;display:flex;flex-direction:column;gap:6px}
+.sb-btn{width:100%;padding:9px;border:none;border-radius:8px;font-size:13px;font-weight:bold;cursor:pointer;transition:background .1s}
+.sb-gen{background:#fff;color:var(--ord)}
+.sb-gen:hover{background:var(--orl)}
+.sb-re{background:rgba(255,255,255,.15);color:#fff;font-size:12px}
+.sb-re:hover{background:rgba(255,255,255,.25)}
+
+/* ── Main wrapper ── */
+.mn-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.mn{flex:1;overflow-y:auto;display:flex;flex-direction:column;padding-bottom:80px}
+
+/* Hero header */
+.hero{background:linear-gradient(135deg,#FF7A00 0%,#E84000 60%,#C23000 100%);color:#fff;padding:26px 32px 22px;position:relative;overflow:hidden;flex-shrink:0}
+.hero::before{content:'';position:absolute;right:-60px;top:-60px;width:240px;height:240px;background:rgba(255,255,255,.06);border-radius:50%}
+.hero::after{content:'';position:absolute;right:80px;bottom:-40px;width:130px;height:130px;background:rgba(255,255,255,.04);border-radius:50%}
+.hero-eyebrow{font-size:13px;font-weight:bold;letter-spacing:3px;opacity:.8;text-transform:uppercase;margin-bottom:7px}
+.hero-title{font-size:32px;font-weight:900;line-height:1.1;margin-bottom:7px}
+.hero-date{font-size:18px;opacity:.85}
+
+/* Content */
+.content{padding:22px 26px 36px;flex:1}
+.sec-label{display:flex;align-items:center;gap:11px;margin-bottom:16px}
+.sec-badge{color:#fff;font-size:13px;font-weight:900;padding:4px 12px;border-radius:20px;letter-spacing:.5px}
+.sec-title{font-size:21px;font-weight:bold;color:var(--tx)}
+.divider{height:1px;background:var(--bd);margin:6px 0 22px}
+
+/* ── News cards ── */
+.news-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:30px}
+.nc{background:var(--wh);border-radius:13px;overflow:hidden;box-shadow:0 1px 7px rgba(0,0,0,.07);display:flex}
+.nc-accent{width:6px;flex-shrink:0}
+.nc-accent-large{background:var(--or)}
+.nc-accent-small{background:#10B981}
+.nc-accent-client{background:#F59E0B}
+.nc-body{padding:16px 18px;flex:1}
+.nc-top{display:flex;align-items:center;gap:9px;margin-bottom:8px;flex-wrap:wrap}
+.nc-tag{font-size:12px;font-weight:bold;padding:3px 10px;border-radius:10px;white-space:nowrap}
+.tag-ma{background:#FEE2E2;color:#991B1B}
+.tag-open{background:#D1FAE5;color:#065F46}
+.tag-close{background:#FEF3C7;color:#92400E}
+.tag-hr{background:#EDE9FE;color:#5B21B6}
+.tag-trend{background:#DBEAFE;color:#1E40AF}
+.nc-scale{font-size:11px;font-weight:bold;padding:2px 8px;border-radius:6px;white-space:nowrap}
+.scale-large{background:#FFF3E8;color:#CC5500}
+.scale-small{background:#ECFDF5;color:#065F46}
+.scale-client{background:#FFFBEB;color:#92400E;border:1px solid #FDE68A}
+.nc-headline{font-size:19px;font-weight:bold;color:var(--tx);line-height:1.35;margin-bottom:7px}
+.nc-body-text{font-size:17px;color:var(--txm);line-height:1.65}
+
+/* ── Labor visual (Section 2) ── */
+.labor-card{background:var(--wh);border-radius:16px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.08);margin-bottom:30px}
+.lc-hero{background:linear-gradient(135deg,#1E1B4B 0%,#312E81 50%,#4C1D95 100%);color:#fff;padding:24px 26px;position:relative;overflow:hidden}
+.lc-hero::after{content:'';position:absolute;right:-30px;top:-30px;width:150px;height:150px;background:rgba(255,255,255,.05);border-radius:50%}
+.lc-tag{font-size:13px;font-weight:bold;letter-spacing:2px;opacity:.7;text-transform:uppercase;margin-bottom:9px}
+.lc-emoji{font-size:40px;margin-bottom:9px;display:block}
+.lc-title{font-size:27px;font-weight:900;line-height:1.2;margin-bottom:9px}
+.lc-simple{background:rgba(255,255,255,.12);border-radius:9px;padding:11px 15px;font-size:17px;line-height:1.55}
+.lc-simple strong{color:#FDE68A}
+.kn-strip{display:flex;gap:0;border-bottom:1px solid var(--bd)}
+.kn-item{flex:1;padding:18px 14px;text-align:center;border-right:1px solid var(--bd)}
+.kn-item:last-child{border-right:none}
+.kn-num{font-size:32px;font-weight:900;color:var(--or);line-height:1}
+.kn-label{font-size:13px;color:var(--txm);margin-top:5px;line-height:1.3}
+.lc-diagram{padding:22px 24px}
+.steps{display:flex;flex-direction:column;gap:0}
+.step{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px dashed var(--bd)}
+.step:last-child{border-bottom:none}
+.step-num{width:36px;height:36px;border-radius:50%;background:var(--or);color:#fff;font-size:17px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-title{font-size:18px;font-weight:bold;color:var(--tx);margin-bottom:4px}
+.step-desc{font-size:16px;color:var(--txm);line-height:1.6}
+.comp{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center}
+.comp-box{border-radius:11px;padding:16px;text-align:center}
+.comp-bad{background:var(--redl);border:2px solid #FCA5A5}
+.comp-good{background:var(--greenl);border:2px solid #86EFAC}
+.comp-arrow{font-size:26px;color:var(--txm)}
+.comp-label{font-size:13px;font-weight:bold;margin-bottom:5px;text-transform:uppercase;letter-spacing:1px}
+.comp-bad .comp-label{color:var(--red)}
+.comp-good .comp-label{color:var(--green)}
+.comp-val{font-size:22px;font-weight:900;margin-bottom:5px}
+.comp-bad .comp-val{color:var(--red)}
+.comp-good .comp-val{color:var(--green)}
+.comp-desc{font-size:14px;color:var(--txm);line-height:1.4}
+.qa-list{display:flex;flex-direction:column;gap:11px}
+.qa-item{border-radius:11px;overflow:hidden}
+.qa-q{background:var(--bluel);padding:12px 16px;font-size:16px;font-weight:bold;color:var(--blue);display:flex;gap:9px}
+.qa-a{background:#F8FAFF;padding:12px 16px;font-size:15px;color:var(--txm);line-height:1.6;display:flex;gap:9px}
+.num-cards{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.num-card{border-radius:11px;padding:16px;text-align:center}
+.num-card:nth-child(1){background:var(--bluel);border:2px solid #BFDBFE}
+.num-card:nth-child(2){background:var(--greenl);border:2px solid #BBF7D0}
+.num-card:nth-child(3){background:var(--purplel);border:2px solid #DDD6FE}
+.num-card:nth-child(4){background:#FFF7ED;border:2px solid var(--orm)}
+.num-card-num{font-size:30px;font-weight:900;margin-bottom:5px}
+.num-card:nth-child(1) .num-card-num{color:var(--blue)}
+.num-card:nth-child(2) .num-card-num{color:var(--green)}
+.num-card:nth-child(3) .num-card-num{color:var(--purple)}
+.num-card:nth-child(4) .num-card-num{color:var(--or)}
+.num-card-label{font-size:13px;color:var(--txm);line-height:1.3}
+/* ── Source links ── */
+.nc-source{font-size:13px;color:var(--txl);margin-top:8px;border-top:1px dashed var(--bd);padding-top:7px}
+.nc-source a{color:var(--blue);text-decoration:none}
+.nc-source a:hover{text-decoration:underline}
+.lc-source-row{font-size:13px;color:rgba(255,255,255,.65);margin-top:10px;border-top:1px solid rgba(255,255,255,.15);padding-top:8px}
+.lc-source-row a{color:rgba(255,255,255,.85);text-decoration:none}
+.lc-source-row a:hover{text-decoration:underline}
+/* ── Section 4: Client News ── */
+.no-info-msg{background:#F9FAFB;border:1.5px dashed #D1D5DB;border-radius:10px;padding:18px 22px;color:#9CA3AF;font-size:15px;text-align:center;margin-bottom:16px}
+.client-news-grid{display:flex;flex-direction:column;gap:12px;margin-bottom:30px}
+.cc-item{background:var(--wh);border-radius:13px;overflow:hidden;box-shadow:0 1px 7px rgba(0,0,0,.07);display:flex}
+.cc-accent{width:6px;background:#F59E0B;flex-shrink:0}
+.cc-body-wrap{padding:16px 18px;flex:1}
+.cc-company-badge{font-size:12px;font-weight:bold;color:#92400E;background:#FFFBEB;display:inline-block;padding:2px 9px;border-radius:6px;margin-bottom:7px;border:1px solid #FDE68A}
+.cc-headline{font-size:19px;font-weight:bold;color:var(--tx);line-height:1.35;margin-bottom:7px}
+.cc-body-text{font-size:17px;color:var(--txm);line-height:1.65}
+.example-box{margin:18px 0 0;background:#FFFBEB;border:2px solid #FDE68A;border-radius:11px;padding:14px 16px}
+.example-label{font-size:13px;font-weight:bold;color:#92400E;letter-spacing:1px;margin-bottom:6px}
+.example-text{font-size:16px;color:var(--tx);line-height:1.6}
+.points-wrap{border-top:1px solid var(--bd);padding:18px 24px}
+.points-title{font-size:14px;font-weight:bold;color:var(--txm);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.point-row{display:flex;gap:11px;margin-bottom:12px;align-items:flex-start}
+.point-row:last-child{margin-bottom:0}
+.point-dot{width:25px;height:25px;min-width:25px;background:var(--or);border-radius:50%;color:#fff;font-size:13px;font-weight:bold;display:flex;align-items:center;justify-content:center;margin-top:3px}
+.point-text{font-size:17px;color:var(--tx);line-height:1.65}
+
+/* ── Section 3: アイスブレイク ── */
+.icebreaker-card{background:var(--wh);border-radius:16px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.08);margin-bottom:20px}
+.ib-hero{background:linear-gradient(135deg,#0369A1 0%,#0EA5E9 60%,#38BDF8 100%);color:#fff;padding:20px 24px;position:relative;overflow:hidden}
+.ib-hero::after{content:'';position:absolute;right:-30px;top:-30px;width:140px;height:140px;background:rgba(255,255,255,.07);border-radius:50%}
+.ib-tag{font-size:13px;font-weight:bold;letter-spacing:2px;opacity:.75;text-transform:uppercase;margin-bottom:7px}
+.ib-title{font-size:22px;font-weight:900;line-height:1.2;margin-bottom:5px}
+.ib-sub{font-size:15px;opacity:.85;line-height:1.5}
+.ib-items{padding:18px 22px;display:flex;flex-direction:column;gap:14px}
+.ib-item{background:var(--icel);border:2px solid #BAE6FD;border-radius:12px;padding:16px 18px}
+.ib-item-num{font-size:12px;font-weight:bold;color:var(--ice);letter-spacing:1px;margin-bottom:6px;text-transform:uppercase}
+.ib-news-ref{font-size:15px;font-weight:bold;color:var(--tx);margin-bottom:8px;padding-bottom:7px;border-bottom:1px dashed #BAE6FD}
+.ib-opening{font-size:17px;color:var(--tx);line-height:1.65;margin-bottom:6px}
+.ib-opening-label{font-size:12px;font-weight:bold;color:var(--ice);margin-bottom:4px}
+.ib-point{font-size:15px;color:var(--txm);line-height:1.6;background:#F7FCFF;border-radius:7px;padding:9px 12px;margin-top:7px}
+.ib-point-label{font-size:12px;font-weight:bold;color:var(--txm);margin-bottom:3px}
+
+/* ── Section 3: 労務提案ストーリー ── */
+.proposal-card{background:var(--wh);border-radius:16px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.08);margin-bottom:30px}
+.pc-hero{background:linear-gradient(135deg,#0F172A 0%,#1E3A5F 55%,#0D4F7C 100%);color:#fff;padding:22px 26px;position:relative;overflow:hidden}
+.pc-hero::after{content:'';position:absolute;right:-30px;top:-30px;width:160px;height:160px;background:rgba(255,255,255,.04);border-radius:50%}
+.pc-tag{font-size:13px;font-weight:bold;letter-spacing:2px;opacity:.65;text-transform:uppercase;margin-bottom:8px}
+.pc-logo{font-size:13px;font-weight:900;background:rgba(255,255,255,.15);display:inline-block;padding:3px 10px;border-radius:5px;margin-bottom:10px;letter-spacing:1px}
+.pc-title{font-size:23px;font-weight:900;line-height:1.2;margin-bottom:10px}
+.pc-hook{background:rgba(255,200,0,.15);border-left:3px solid #FCD34D;border-radius:0 8px 8px 0;padding:11px 15px;font-size:17px;line-height:1.55;color:#FFF9E6}
+.pc-body{padding:22px 24px;display:flex;flex-direction:column;gap:18px}
+.pc-section-title{font-size:14px;font-weight:bold;color:var(--txm);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.story-box{background:linear-gradient(135deg,#F0F9FF,#E0F2FE);border:2px solid #BAE6FD;border-radius:12px;padding:18px}
+.story-text{font-size:17px;color:var(--tx);line-height:1.75}
+.closing-box{background:#FFFBEB;border:2px solid #FDE68A;border-radius:10px;padding:14px 16px}
+.closing-label{font-size:13px;font-weight:bold;color:#92400E;letter-spacing:1px;margin-bottom:7px}
+.closing-q{font-size:19px;font-weight:bold;color:var(--tx);line-height:1.4}
+
+/* ── Section 3 wrap ── */
+.sec3-wrap{display:flex;flex-direction:column;gap:0}
+
+/* ── Bottom Q&A bar ── */
+.bottom-bar{flex-shrink:0;background:var(--wh);border-top:2px solid var(--bd);padding:12px 16px;display:flex;flex-direction:column;gap:0}
+.bottom-bar-inner{display:flex;gap:10px;align-items:center}
+.bottom-bar-label{font-size:13px;font-weight:bold;color:var(--or);margin-bottom:7px}
+.bottom-input{flex:1;padding:12px 16px;border:2px solid var(--bd);border-radius:12px;font-size:17px;font-family:inherit;outline:none;color:var(--tx);transition:border .15s}
+.bottom-input:focus{border-color:var(--or)}
+.bottom-send{background:var(--or);color:#fff;border:none;padding:12px 20px;border-radius:12px;font-size:17px;font-weight:bold;cursor:pointer;transition:background .1s;white-space:nowrap;flex-shrink:0}
+.bottom-send:hover{background:var(--ord)}
+.bottom-send:disabled{background:#ccc;cursor:not-allowed}
+.qa-response{background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:2px solid #86EFAC;border-radius:12px;padding:16px 18px;margin-top:10px;font-size:17px;color:var(--tx);line-height:1.7;animation:fadeIn .3s ease}
+.qa-response-label{font-size:13px;font-weight:bold;color:var(--green);margin-bottom:8px}
+.qa-response-close{float:right;background:none;border:none;font-size:18px;cursor:pointer;color:var(--txm);margin-left:8px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Search */
+.sr-wrap{flex:1;padding:22px 26px 32px}
+.sr-header{margin-bottom:18px}
+.sr-title{font-size:23px;font-weight:bold;color:var(--ord)}
+.sr-count{font-size:16px;color:var(--txm);margin-top:4px}
+.sr-card{background:var(--wh);border-radius:13px;margin-bottom:13px;overflow:hidden;box-shadow:0 1px 7px rgba(0,0,0,.07);cursor:pointer;transition:box-shadow .15s}
+.sr-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.sr-card-head{background:var(--or);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.sr-card-date{color:#fff;font-size:16px;font-weight:bold}
+.sr-card-num{color:rgba(255,255,255,.75);font-size:13px}
+.sr-matches{padding:14px 16px;display:flex;flex-direction:column;gap:7px}
+.sr-match-item{font-size:16px;color:var(--tx);line-height:1.5;padding:8px 12px;background:var(--bg);border-radius:7px;border-left:3px solid var(--or)}
+.sr-match-label{font-size:12px;font-weight:bold;color:var(--or);margin-bottom:3px}
+mark{background:#FFE58A;color:var(--tx);border-radius:2px;padding:0 2px}
+
+/* States */
+.s-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 32px;text-align:center}
+.s-icon{font-size:60px;margin-bottom:15px}
+.s-title{font-size:28px;font-weight:900;color:var(--ord);margin-bottom:11px}
+.s-desc{font-size:18px;color:var(--txm);margin-bottom:26px;max-width:360px;line-height:1.65}
+.s-btn{background:var(--or);color:#fff;border:none;padding:15px 34px;border-radius:13px;font-size:20px;font-weight:bold;cursor:pointer;box-shadow:0 4px 14px rgba(255,122,0,.35);transition:transform .1s,box-shadow .1s}
+.s-btn:hover{transform:translateY(-2px);box-shadow:0 7px 20px rgba(255,122,0,.45)}
+.s-load{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px;text-align:center}
+.spin{width:56px;height:56px;border:5px solid var(--orl);border-top-color:var(--or);border-radius:50%;animation:spin .75s linear infinite;margin-bottom:20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin-msg{font-size:21px;color:var(--txm)}
+.spin-step{font-size:17px;color:var(--or);margin-top:9px}
+.footer{padding:16px 26px;border-top:1px solid var(--bd);font-size:14px;color:var(--txl);text-align:center}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Sidebar -->
+<div class="sb">
+  <div class="sb-brand">
+    <div class="sb-logo">📰 Daily HR</div>
+    <div class="sb-sub">飲食・人事ニュースレター</div>
+  </div>
+  <div class="sb-search">
+    <div class="sb-search-box">
+      <span class="sb-search-icon">🔍</span>
+      <input class="sb-search-input" id="searchInput" type="text" placeholder="キーワード検索..." oninput="onSearch(this.value)" autocomplete="off">
+      <button class="sb-search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+    </div>
+  </div>
+  <div class="sb-list" id="sbList"><div class="sb-none">まだ号がありません</div></div>
+  <div class="sb-foot">
+    <button class="sb-btn sb-gen" onclick="generateToday()">＋ 今日の号を生成</button>
+    <button class="sb-btn sb-re" onclick="regenToday()">🔄 今日の号を再生成</button>
+  </div>
+</div>
+
+<!-- Main + Bottom bar -->
+<div class="mn-wrap">
+  <div class="mn" id="mn">
+    <div class="s-empty">
+      <div class="s-icon">🍜</div>
+      <div class="s-title">今日のニュースレター</div>
+      <div class="s-desc">飲食業界の人事トレンド・労務トピックス・ラフテルズ商談アプローチを毎日まとめます。</div>
+      <button class="s-btn" onclick="generateToday()">🔍 今日の号を生成する</button>
+    </div>
+  </div>
+
+  <!-- Bottom Q&A bar -->
+  <div class="bottom-bar">
+    <div class="bottom-bar-label">💬 このニュースレターについて深掘り質問</div>
+    <div class="bottom-bar-inner">
+      <input class="bottom-input" id="qaInput" type="text" placeholder="例：「この法改正は飲食店にどう影響しますか？」" onkeydown="if(event.key==='Enter')sendQA()">
+      <button class="bottom-send" id="qaSend" onclick="sendQA()">送信</button>
+    </div>
+    <div id="qaResponse"></div>
+  </div>
+</div>
+
+</div><!-- .app -->
+
+<script>
+const KEY='hr_nl_v7';
+// ━━ WEEKLY ISSUE DATA — スケジュールタスクが自動更新。手動編集禁止 ━━
+const WEEKLY_ISSUE_DATA = null; // AUTO-UPDATED BY SCHEDULED TASK
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+let activeDate=null, generating=false, searchQuery='';
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}};
+const saveAll=d=>localStorage.setItem(KEY,JSON.stringify(d));
+function upsert(issue){const l=load();const i=l.findIndex(x=>x.date===issue.date);if(i>=0)l[i]=issue;else l.unshift(issue);saveAll(l);}
+function todayStr(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function jpDate(s){const[y,m,d]=s.split('-').map(Number);const days=['日','月','火','水','木','金','土'];return`${y}年${m}月${d}日（${days[new Date(y,m-1,d).getDay()]}）`;}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function toStr(v){
+  if(typeof v==='string') return v;
+  if(!v) return '';
+  if(Array.isArray(v)){const t=v.find(b=>b&&b.type==='text');return t?String(t.text||''):v.map(b=>b?.text||'').join('');}
+  if(typeof v==='object'){
+    if(typeof v.text==='string') return v.text;
+    if(typeof v.content==='string') return v.content;
+    if(typeof v.response==='string') return v.response;
+    if(Array.isArray(v.content)){const t=v.content.find(b=>b&&b.type==='text');if(t)return String(t.text||'');}
+    return JSON.stringify(v);
+  }
+  return String(v);
+}
+function parseJSON(raw){
+  const text=toStr(raw);if(!text)return null;
+  try{return JSON.parse(text.trim());}catch(e){}
+  const mb=text.match(/```(?:json)?\s*([\s\S]*?)```/);if(mb){try{return JSON.parse(mb[1].trim());}catch(e){}}
+  const as=text.indexOf('['),ae=text.lastIndexOf(']');if(as>=0&&ae>as){try{return JSON.parse(text.slice(as,ae+1));}catch(e){}}
+  const os=text.indexOf('{'),oe=text.lastIndexOf('}');if(os>=0&&oe>os){try{return JSON.parse(text.slice(os,oe+1));}catch(e){}}
+  return null;
+}
+
+function tagClass(tag){
+  const t=tag||'';
+  if(t.includes('M&A')||t.includes('買収'))return'tag-ma';
+  if(t.includes('出店')||t.includes('開店'))return'tag-open';
+  if(t.includes('撤退')||t.includes('閉店'))return'tag-close';
+  if(t.includes('人事'))return'tag-hr';
+  return'tag-trend';
+}
+function accentClass(scale){
+  if(scale==='中小')return'nc-accent-small';
+  if(scale==='顧問先')return'nc-accent-client';
+  return'nc-accent-large';
+}
+function scaleClass(scale){
+  if(scale==='中小')return'scale-small';
+  if(scale==='顧問先')return'scale-client';
+  return'scale-large';
+}
+function scaleLabel(scale){
+  if(scale==='中小')return'🏪 中小規模';
+  if(scale==='顧問先')return'⭐ 顧問先';
+  return'🏢 大手';
+}
+
+function renderDiagram(visual){
+  if(!visual)return'';
+  const type=visual.type||'steps';
+  if(type==='comparison'&&visual.data){
+    const[a,b]=visual.data;
+    return`<div class="comp">
+      <div class="comp-box comp-bad"><div class="comp-label">${esc(a?.label||'従来')}</div><div class="comp-val">${esc(a?.value||'')}</div><div class="comp-desc">${esc(a?.desc||'')}</div></div>
+      <div class="comp-arrow">→</div>
+      <div class="comp-box comp-good"><div class="comp-label">${esc(b?.label||'改正後')}</div><div class="comp-val">${esc(b?.value||'')}</div><div class="comp-desc">${esc(b?.desc||'')}</div></div>
+    </div>`;
+  }
+  if(type==='steps'&&visual.data){
+    return`<div class="steps">${visual.data.map((s,i)=>`
+      <div class="step"><div class="step-num">${i+1}</div><div><div class="step-title">${esc(s.title||s.label||'')}</div><div class="step-desc">${esc(s.desc||s.description||'')}</div></div></div>`).join('')}</div>`;
+  }
+  if(type==='qa'&&visual.data){
+    return`<div class="qa-list">${visual.data.map(q=>`
+      <div class="qa-item"><div class="qa-q"><span>Q</span><span>${esc(q.q||q.question||'')}</span></div><div class="qa-a"><span>A</span><span>${esc(q.a||q.answer||'')}</span></div></div>`).join('')}</div>`;
+  }
+  if(type==='numbers'&&visual.data){
+    return`<div class="num-cards">${visual.data.map(n=>`
+      <div class="num-card"><div class="num-card-num">${esc(n.value||'')}</div><div class="num-card-label">${esc(n.label||'')}</div></div>`).join('')}</div>`;
+  }
+  return'';
+}
+
+function showIssue(date){
+  const list=load();const issue=list.find(x=>x.date===date);if(!issue)return;
+  activeDate=date;renderSidebar();
+  const num=list.length-list.findIndex(x=>x.date===date);
+  const news=issue.newsItems||[];const topic=issue.topic||{};
+  const icebreakers=issue.icebreakers||[];const laborProposal=issue.laborProposal||{};
+  const clientNews=issue.clientNews||[];
+
+  // ① News（出典付き）
+  const newsHTML=news.map(n=>{
+    const sc=n.scale||'大手';
+    const srcHTML=n.url
+      ?`<div class="nc-source">📎 出典：<a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.source||n.url)}</a>${n.date?` (${esc(n.date)})`:''}  </div>`
+      :n.source?`<div class="nc-source">📎 出典：${esc(n.source)}</div>`:'';
+    return`<div class="nc">
+      <div class="nc-accent ${accentClass(sc)}"></div>
+      <div class="nc-body">
+        <div class="nc-top">
+          <span class="nc-tag ${tagClass(n.tag)}">${esc(n.tag)}</span>
+          <span class="nc-scale ${scaleClass(sc)}">${scaleLabel(sc)}</span>
+        </div>
+        <div class="nc-headline">${esc(n.headline)}</div>
+        <div class="nc-body-text">${esc(n.body)}</div>
+        ${srcHTML}
+      </div>
+    </div>`;
+  }).join('');
+
+  // ② Labor（出典付き）
+  const diagHTML=renderDiagram(topic.visual);
+  const exHTML=topic.example?`<div class="example-box"><div class="example-label">📖 具体例（飲食店の現場）</div><div class="example-text">${esc(topic.example)}</div></div>`:'';
+  const keyNums=(topic.keyNumbers||[]).length?`<div class="kn-strip">${(topic.keyNumbers||[]).map(k=>`<div class="kn-item"><div class="kn-num">${esc(k.value||'')}</div><div class="kn-label">${esc(k.label||'')}</div></div>`).join('')}</div>`:'';
+  const pointsHTML=(topic.points||[]).map((p,i)=>`<div class="point-row"><div class="point-dot">${i+1}</div><div class="point-text">${esc(p)}</div></div>`).join('');
+  const topicSrcHTML=topic.sourceUrl
+    ?`<div class="lc-source-row">📎 出典・参考：<a href="${esc(topic.sourceUrl)}" target="_blank" rel="noopener">${esc(topic.sourceName||topic.sourceUrl.slice(0,40))}</a></div>`
+    :`<div class="lc-source-row">📎 出典：${esc(topic.lawRef||'労働基準法・関連法令')}（AI解説）</div>`;
+
+  // ③-a アイスブレイク
+  const ibHTML=icebreakers.length?`
+    <div class="icebreaker-card">
+      <div class="ib-hero">
+        <div class="ib-tag">Ice Breaker</div>
+        <div class="ib-title">🧊 アイスブレイクネタ</div>
+        <div class="ib-sub">今日のニュースを会話の入り口に使おう</div>
+      </div>
+      <div class="ib-items">
+        ${icebreakers.map((ib,i)=>`
+          <div class="ib-item">
+            <div class="ib-item-num">ネタ ${i+1}</div>
+            <div class="ib-news-ref">📰 ${esc(ib.newsRef||ib.news||'')}</div>
+            <div class="ib-opening-label">💬 切り出し方</div>
+            <div class="ib-opening">${esc(ib.opening||ib.hook||'')}</div>
+            <div class="ib-point"><div class="ib-point-label">💡 そこから広がる話題</div>${esc(ib.point||ib.talkingPoint||'')}</div>
+          </div>`).join('')}
+      </div>
+    </div>`:'';
+
+  // ③-b 労務提案ストーリー
+  const proposalHTML=laborProposal.hook?`
+    <div class="proposal-card">
+      <div class="pc-hero">
+        <div class="pc-tag">Labor Consulting Story</div>
+        <div class="pc-logo">🏢 RAFTELS</div>
+        <div class="pc-title">💼 労務提案ストーリー</div>
+        <div class="pc-hook">🎯 ${esc(laborProposal.hook)}</div>
+      </div>
+      <div class="pc-body">
+        ${laborProposal.story?`<div><div class="pc-section-title">📖 提案ストーリー</div><div class="story-box"><div class="story-text">${esc(laborProposal.story)}</div></div></div>`:''}
+        ${laborProposal.closingQuestion?`<div class="closing-box"><div class="closing-label">🔑 クロージング質問</div><div class="closing-q">「${esc(laborProposal.closingQuestion)}」</div></div>`:''}
+      </div>
+    </div>`:'';
+
+  // ④ ラフテルズ顧問先ニュース（情報がない場合も常にセクション表示）
+  const clientNewsBody=clientNews.length
+    ?clientNews.map(cn=>`
+        <div class="cc-item">
+          <div class="cc-accent"></div>
+          <div class="cc-body-wrap">
+            <span class="cc-company-badge">⭐ ${esc(cn.company||'顧問先')}</span>
+            <div class="cc-headline">${esc(cn.headline)}</div>
+            <div class="cc-body-text">${esc(cn.body)}</div>
+            ${cn.url?`<div class="nc-source">📎 出典：<a href="${esc(cn.url)}" target="_blank" rel="noopener">${esc(cn.source||cn.url.slice(0,40))}</a>${cn.date?` (${esc(cn.date)})`:''}  </div>`:cn.source?`<div class="nc-source">📎 出典：${esc(cn.source)}</div>`:''}
+          </div>
+        </div>`).join('')
+    :`<div class="no-info-msg">📭 新規の情報なし</div>`;
+
+  document.getElementById('mn').innerHTML=`
+    <div class="hero">
+      <div class="hero-eyebrow">Weekly HR Newsletter / No.${num}</div>
+      <div class="hero-title">飲食・人事 ウィークリーニュース</div>
+      <div class="hero-date">📅 ${jpDate(issue.date)}</div>
+    </div>
+    <div class="content">
+      <div class="sec-label"><span class="sec-badge" style="background:var(--or)">① NEWS</span><span class="sec-title">飲食人事トレンドニュース</span></div>
+      <div class="news-grid">${newsHTML||'<div class="no-info-msg">📭 新規の情報なし</div>'}</div>
+
+      <div class="divider"></div>
+      <div class="sec-label"><span class="sec-badge" style="background:var(--purple)">② TOPIC</span><span class="sec-title">人事労務 今週のトピックス</span></div>
+      <div class="labor-card">
+        <div class="lc-hero"><div class="lc-tag">Weekly Labor Law Topic</div><span class="lc-emoji">${esc(topic.emoji||'📋')}</span><div class="lc-title">${esc(topic.title||'今週のトピック')}</div><div class="lc-simple">🏫 <strong>一言でいうと：</strong>${esc(topic.simpleExplain||'')}</div>${topicSrcHTML}</div>
+        ${keyNums}
+        <div class="lc-diagram">${diagHTML}${exHTML}</div>
+        <div class="points-wrap"><div class="points-title">📌 まとめ</div>${pointsHTML||'<div class="no-info-msg">📭 新規の情報なし</div>'}</div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="sec-label"><span class="sec-badge" style="background:#0369A1">③ APPROACH</span><span class="sec-title">ラフテルズ 商談アプローチ</span></div>
+      <div class="sec3-wrap">
+        ${ibHTML||'<div class="no-info-msg">📭 新規の情報なし</div>'}
+        ${proposalHTML||'<div class="no-info-msg" style="margin-top:0">📭 新規の情報なし</div>'}
+      </div>
+
+      <div class="divider"></div>
+      <div class="sec-label"><span class="sec-badge" style="background:#D97706">④ CLIENT</span><span class="sec-title">ラフテルズ顧問先ニュース</span></div>
+      <div class="client-news-grid">${clientNewsBody}</div>
+    </div>
+    <div class="footer">Weekly HR Newsletter by ラフテルズ — 飲食業界の人事・労務情報をAIが毎週まとめています</div>`;
+  document.getElementById('qaResponse').innerHTML='';
+}
+
+/* ── Q&A Bottom bar ── */
+async function sendQA(){
+  const input=document.getElementById('qaInput');
+  const btn=document.getElementById('qaSend');
+  const resp=document.getElementById('qaResponse');
+  const q=(input.value||'').trim();
+  if(!q)return;
+  const list=load();
+  const issue=activeDate?list.find(x=>x.date===activeDate):null;
+  btn.disabled=true;btn.textContent='送信中...';
+  resp.innerHTML='<div class="qa-response"><div class="qa-response-label">💬 回答を生成中...</div></div>';
+  try{
+    const ctx=issue?`
+【今日のニュースレター（${jpDate(issue.date)}）の内容】
+飲食ニュース：${(issue.newsItems||[]).map(n=>`[${n.scale||'大手'}]${n.headline} - ${n.body}`).join(' / ')}
+労務トピック：${issue.topic?.title||''} - ${(issue.topic?.points||[]).join(' / ')}
+提案ストーリー：${issue.laborProposal?.story||''}
+`:'【ニュースレターは未生成です】';
+    const prompt=`あなたはラフテルズという飲食業界専門の人事コンサルタントです。
+${ctx}
+
+ユーザーの質問：「${q}」
+
+上記のニュースレター内容を踏まえて、飲食業の経営者・人事担当者にとって実践的で分かりやすい回答を日本語で200〜300字でまとめてください。`;
+    const raw=await window.cowork.askClaude(prompt,[]);
+    const ans=toStr(raw);
+    resp.innerHTML=`<div class="qa-response"><button class="qa-response-close" onclick="document.getElementById('qaResponse').innerHTML=''">✕</button><div class="qa-response-label">💬 ${esc(q)}</div>${esc(ans)}</div>`;
+    input.value='';
+  }catch(e){
+    resp.innerHTML=`<div class="qa-response"><div class="qa-response-label">⚠️ エラー</div>${esc(String(e?.message||e))}</div>`;
+  }
+  btn.disabled=false;btn.textContent='送信';
+}
+
+/* ── Search ── */
+function highlight(text,q){
+  if(!q||!text)return esc(text||'');
+  const escaped=esc(text);
+  const re=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+  return escaped.replace(re,m=>`<mark>${m}</mark>`);
+}
+function issueMatch(issue,q){
+  if(!q)return true;const ql=q.toLowerCase();
+  return[
+    issue.date,
+    ...(issue.newsItems||[]).map(n=>`${n.tag} ${n.headline} ${n.body} ${n.scale||''}`),
+    issue.topic?.title||'',issue.topic?.simpleExplain||'',
+    ...(issue.topic?.points||[]),issue.topic?.example||'',
+    ...(issue.icebreakers||[]).map(ib=>`${ib.newsRef||''} ${ib.opening||ib.hook||''} ${ib.point||ib.talkingPoint||''}`),
+    issue.laborProposal?.hook||'',issue.laborProposal?.story||''
+  ].some(t=>(t||'').toLowerCase().includes(ql));
+}
+function getSnippets(issue,q){
+  if(!q)return[];const ql=q.toLowerCase();const s=[];
+  (issue.newsItems||[]).forEach(n=>{if((`${n.headline} ${n.body}`).toLowerCase().includes(ql))s.push({label:'飲食ニュース',text:n.headline});});
+  const tp=issue.topic||{};
+  if((tp.title||'').toLowerCase().includes(ql))s.push({label:'労務トピック',text:tp.title});
+  (tp.points||[]).forEach(p=>{if((p||'').toLowerCase().includes(ql))s.push({label:'まとめポイント',text:p});});
+  (issue.icebreakers||[]).forEach(ib=>{if((`${ib.newsRef||''} ${ib.opening||''}`).toLowerCase().includes(ql))s.push({label:'アイスブレイク',text:(ib.newsRef||'').slice(0,30)});});
+  const pr=issue.laborProposal||{};
+  if((pr.hook||'').toLowerCase().includes(ql))s.push({label:'提案フック',text:pr.hook});
+  if((pr.story||'').toLowerCase().includes(ql))s.push({label:'提案ストーリー',text:(pr.story||'').slice(0,60)+'…'});
+  return s.slice(0,3);
+}
+function renderSidebar(){
+  const list=load();const el=document.getElementById('sbList');
+  const q=searchQuery.trim();
+  const filtered=q?list.filter(iss=>issueMatch(iss,q)):list;
+  if(!list.length){el.innerHTML='<div class="sb-none">まだ号がありません</div>';return;}
+  if(!filtered.length){el.innerHTML=`<div class="sb-none">「${esc(q)}」の結果なし</div>`;return;}
+  el.innerHTML=filtered.map(iss=>{
+    const idx=list.findIndex(x=>x.date===iss.date);
+    const num=list.length-idx;
+    const snips=getSnippets(iss,q);
+    const matchLine=snips.length?`<div class="sb-match">📍${esc(snips[0].label)}：${esc(snips[0].text.slice(0,16))}…</div>`:'';
+    return`<div class="sb-item ${iss.date===activeDate?'on':q?'sh':''}" onclick="showIssueFromSearch('${iss.date}')">
+      <div class="sb-idate">${jpDate(iss.date)}</div>
+      <div class="sb-inum">No.${num}</div>${matchLine}
+    </div>`;
+  }).join('');
+}
+function onSearch(val){
+  searchQuery=val.trim();
+  const cl=document.getElementById('searchClear');if(cl)cl.style.display=searchQuery?'block':'none';
+  renderSidebar();
+  if(searchQuery)showSearchResults(searchQuery);
+  else if(activeDate)showIssue(activeDate);else showEmpty();
+}
+function clearSearch(){
+  searchQuery='';
+  const inp=document.getElementById('searchInput');const cl=document.getElementById('searchClear');
+  if(inp)inp.value='';if(cl)cl.style.display='none';
+  renderSidebar();
+  if(activeDate)showIssue(activeDate);else showEmpty();
+}
+function showIssueFromSearch(date){activeDate=date;renderSidebar();showIssue(date);}
+function showSearchResults(q){
+  const list=load();const matched=list.filter(iss=>issueMatch(iss,q));
+  const mn=document.getElementById('mn');
+  if(!matched.length){mn.innerHTML=`<div class="s-empty"><div class="s-icon">🔍</div><div class="s-title">見つかりませんでした</div><div class="s-desc">「${esc(q)}」に一致するニュースレターがありません。</div></div>`;return;}
+  mn.innerHTML=`<div class="sr-wrap">
+    <div class="sr-header"><div class="sr-title">🔍「${esc(q)}」の検索結果</div><div class="sr-count">${matched.length}件が見つかりました</div></div>
+    ${matched.map(iss=>{
+      const idx=list.findIndex(x=>x.date===iss.date);
+      const num=list.length-idx;
+      const snips=getSnippets(iss,q);
+      return`<div class="sr-card" onclick="showIssueFromSearch('${iss.date}')">
+        <div class="sr-card-head"><span class="sr-card-date">📅 ${jpDate(iss.date)}</span><span class="sr-card-num">No.${num}</span></div>
+        <div class="sr-matches">${snips.map(s=>`<div class="sr-match-item"><div class="sr-match-label">${esc(s.label)}</div>${highlight(s.text,q)}</div>`).join('')}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+function showEmpty(){
+  document.getElementById('mn').innerHTML=`<div class="s-empty"><div class="s-icon">🍜</div><div class="s-title">今日のニュースレター</div><div class="s-desc">飲食業界の人事トレンド・労務トピックス・ラフテルズ商談アプローチを毎日まとめます。</div><button class="s-btn" onclick="generateToday()">🔍 今日の号を生成する</button></div>`;
+}
+
+/* ── Regenerate ── */
+function regenToday(){
+  const today=todayStr();saveAll(load().filter(x=>x.date!==today));
+  activeDate=null;generating=false;renderSidebar();
+  document.getElementById('mn').innerHTML=`<div class="s-empty"><div class="s-icon">🗑️</div><div class="s-title">削除しました</div><div class="s-desc">「今日の号を生成」を押して再生成してください。</div><button class="s-btn" onclick="generateToday()">🔍 今日の号を生成する</button></div>`;
+}
+
+/* ── Generate ── */
+async function generateToday(){
+  if(generating)return;
+  const today=todayStr();
+  const existing=load().find(x=>x.date===today);if(existing){showIssue(today);return;}
+  generating=true;
+  document.getElementById('mn').innerHTML=`<div class="s-load"><div class="spin"></div><div class="spin-msg">AIがニュースレターを作成中...</div><div class="spin-step" id="step">準備中...</div></div>`;
+  const setStep=t=>{const e=document.getElementById('step');if(e)e.textContent=t;};
+
+  // callMcpTool が使えるか確認
+  const canCallMcp=typeof window.cowork?.callMcpTool==='function';
+
+  let newsItems=[], topic={}, icebreakers=[], laborProposal={}, clientNews=[];
+  try{
+
+  /* ① News: Exaでリアルタイム検索 */
+  setStep('① 飲食業界の最新ニュースをWeb検索中...');
+  let rawNewsText='';
+  try{
+    const sr=await window.cowork.callMcpTool(
+      'mcp__cfba6524-a79c-4d25-9a05-0b69f8f9ac1e__web_search_exa',
+      {query:`飲食業界 チェーン店 最新ニュース M&A 出店 閉店 撤退 人事異動 ${today}`, numResults:8}
+    );
+    if(!sr.isError) rawNewsText=toStr(sr.content).slice(0,3500);
+  }catch(e){console.warn('Exa news search',e);}
+
+  setStep('① ニュースを整形中...');
+  try{
+    const prompt=rawNewsText
+      ?`以下の実際のニュースから5件選び、出典情報を含めたJSONの配列のみ出力してください。
+
+【Web検索結果（${today}）】
+${rawNewsText}
+
+出力形式（sourceとurlとdateを必ず含めること）：
+[{"tag":"M&A","headline":"モスフードサービスがBYOを112億円で子会社化","body":"モスフードサービスはBYO（おぼんdeごはん・和食酒えん運営）を約112億円で取得。健康志向の和食業態を新たな事業の柱とし、FCノウハウで新規出店を推進する","scale":"大手","source":"時事通信","url":"https://www.jiji.com/...","date":"2026-06-30"}]
+
+ルール：
+1. 大手3件(scale:大手)・中小2件(scale:中小)
+2. tagはM&A/出店/撤退/人事異動/業態転換/トレンドのいずれか
+3. sourceは記事の媒体名、urlは記事の実際のURL（検索結果にあるもの）、dateはYYYY-MM-DD形式
+4. 事実に基づいた内容のみ。JSONの配列のみ返すこと`
+      :`飲食業界ニュース5件をJSONの配列のみで出力（Web検索不可のためAI知識で生成）。
+[{"tag":"M&A","headline":"見出し","body":"詳細","scale":"大手","source":"日経MJ（AI生成）","url":"","date":"${today}"}]
+大手3件・中小2件。具体社名必須。JSONの配列のみ返すこと`;
+    const r=await window.cowork.askClaude(prompt,[]);
+    const d=parseJSON(toStr(r));
+    if(Array.isArray(d)&&d.length>0) newsItems=d;
+    else console.warn('①news parse fail:',toStr(r).slice(0,200));
+  }catch(e){console.warn('①news format',e);}
+
+  /* ② Labor topic */
+  setStep('② 人事労務トピックを生成中...');
+  try{
+    // 過去に使ったトピックを取得して被りを防ぐ
+    const usedTopics=load().slice(0,14).map(x=>x.topic?.title||'').filter(Boolean);
+    const avoidList=usedTopics.length?`\n【使用済み・今回は絶対に選ばないこと】${usedTopics.join('/')}`:''
+    const r=await window.cowork.askClaude(
+`飲食業向け人事労務トピックをJSONオブジェクトのみで出力してください。${avoidList}
+
+選択肢（上記の使用済みと被らないものを選ぶ）：時間外労働上限/年5日有給義務/同一労働同一賃金/社会保険適用拡大/深夜割増25%/育休取得促進/雇用契約書必須記載/36協定締結/最低賃金改定/マイナンバー管理/ハラスメント防止法/外国人雇用/雇用保険加入条件/労働者名簿保管/賃金台帳作成/就業規則作成義務/有期雇用と無期転換/試用期間の法的扱い
+
+{"emoji":"📋","title":"テーマ名（20字以内）","simpleExplain":"高校生でも分かる説明（50字以内）","keyNumbers":[{"value":"具体的な数字・%","label":"ラベル"},{"value":"具体的な数字","label":"ラベル"}],"visual":{"type":"steps","data":[{"title":"項目1","desc":"具体的な説明"},{"title":"項目2","desc":"具体的な説明"},{"title":"項目3","desc":"具体的な説明"}]},"example":"飲食店の現場で起きる具体的なケース（80〜100字）","points":["ポイント1：具体的な数字や期限を含めて（70〜90字）","ポイント2：違反した場合のリスクや罰則（70〜90字）","ポイント3：飲食店オーナーが今すぐできる対策（70〜90字）"]}
+
+JSONオブジェクトのみ返すこと`,[]);
+    topic=parseJSON(toStr(r))||{};
+  }catch(e){console.warn('②topic',e);}
+
+  /* ②-b 労務トピックの出典をExaで検索 */
+  if(topic.title){
+    setStep('② 労務トピックの出典を検索中...');
+    try{
+      const sr=await window.cowork.callMcpTool(
+        'mcp__cfba6524-a79c-4d25-9a05-0b69f8f9ac1e__web_search_exa',
+        {query:`${topic.title} 厚生労働省 労働基準法 飲食業 解説`, numResults:3}
+      );
+      if(!sr.isError){
+        const t=toStr(sr.content);
+        const urlM=t.match(/URL:\s*(https?:\/\/[^\s\n]+)/);
+        const titleM=t.match(/Title:\s*([^\n]+)/);
+        if(urlM){topic.sourceUrl=urlM[1];topic.sourceName=(titleM?titleM[1]:'').slice(0,35);}
+      }
+    }catch(e){console.warn('②topic src',e);}
+  }
+
+  /* ③-a アイスブレイク */
+  setStep('③ アイスブレイクネタを生成中...');
+  try{
+    const newsSnip=newsItems.map(n=>`・${n.headline}（${n.body?.slice(0,40)}）`).join('\n').slice(0,400)||'飲食業界の最新動向';
+    const r=await window.cowork.askClaude(
+`飲食業の経営者との商談で使えるアイスブレイクネタを3つ、JSONの配列のみで出力してください。
+
+[{"newsRef":"参照ニュース見出し（25字以内）","opening":"「吉野家が〜とのことですが、御社では〜でしょうか？」のように会社名入りで切り出す（60字以内）","point":"そこから自然に広がる経営者目線の話題（60字以内）"}]
+
+本日の飲食ニュース：
+${newsSnip}
+
+注意：労務・法律の話は一切含めない。世間話・業界雑談として使えるネタにする。JSONの配列のみ返すこと`,[]);
+    const d=parseJSON(toStr(r));
+    if(Array.isArray(d)&&d.length>0) icebreakers=d;
+    else console.warn('③ib parse failed:',toStr(r).slice(0,200));
+  }catch(e){console.warn('③ib error',e);}
+
+  /* ③-b 労務提案 */
+  setStep('③ 労務提案ストーリーを生成中...');
+  try{
+    const topicSnip=[
+      topic.title||'労務管理',
+      topic.simpleExplain||'',
+      ...(topic.points||[])
+    ].filter(Boolean).join('。').slice(0,400);
+    const r=await window.cowork.askClaude(
+`ラフテルズ（飲食専門の人事コンサルティング）として飲食業経営者への提案ストーリーをJSONオブジェクトのみで出力してください。
+
+{"hook":"なぜ今この労務問題が飲食業の経営者にとってリスクなのかを一言で（65字以内）","story":"実際の商談で使えるストーリー200〜250字。構成は「①飲食店オーナーが陥りやすい課題の提示 → ②放置した場合のリスク（罰則・離職・訴訟等） → ③ラフテルズが具体的に何をサポートするか → ④導入後の期待成果」の順で書く","closingQuestion":"「〜についていかがでしょうか？」の形で終わるクロージング質問（45字以内）"}
+
+労務トピック内容：${topicSnip}
+JSONオブジェクトのみ返すこと`,[]);
+    const d=parseJSON(toStr(r));
+    if(d&&d.hook) laborProposal=d;
+    else console.warn('③prop parse failed:',toStr(r).slice(0,200));
+  }catch(e){console.warn('③prop error',e);}
+
+  /* ④ ラフテルズ顧問先ニュース */
+  setStep('④ ラフテルズ顧問先ニュースを検索中...');
+  try{
+    // ラフテルズHPから顧問先情報を取得
+    let clientNames='LH株式会社 OR 株式会社ワールドセンス';
+    try{
+      const lpR=await window.cowork.callMcpTool(
+        'mcp__cfba6524-a79c-4d25-9a05-0b69f8f9ac1e__web_fetch_exa',
+        {urls:['https://laftels.com/news/','https://laftels.com/'],maxCharacters:2000}
+      );
+      if(!lpR.isError){
+        const lpText=toStr(lpR.content);
+        // 株式会社〜 / 合同会社〜 など会社名を抽出
+        const companyMatches=lpText.match(/(?:株式会社|合同会社|有限会社|一般社団法人)[぀-鿿゠-ヿa-zA-Z0-9&．・]+/g)||[];
+        const unique=[...new Set(companyMatches)].slice(0,5);
+        if(unique.length) clientNames=unique.join(' OR ');
+      }
+    }catch(e){console.warn('laftels hp',e);}
+
+    // 顧問先ニュースを検索
+    const cnR=await window.cowork.callMcpTool(
+      'mcp__cfba6524-a79c-4d25-9a05-0b69f8f9ac1e__web_search_exa',
+      {query:`${clientNames} 飲食 ニュース 最新情報 ${today}`,numResults:5}
+    );
+    if(!cnR.isError){
+      const cnText=toStr(cnR.content).slice(0,2500);
+      const r=await window.cowork.askClaude(
+`ラフテルズの顧問先企業に関するニュースを以下の検索結果から抽出し、JSONの配列のみで出力してください。
+ラフテルズ既知の顧問先：LH株式会社、株式会社ワールドセンス
+
+【検索結果】
+${cnText}
+
+[{"company":"会社名","headline":"見出し25字以内","body":"詳細80〜120字","source":"出典メディア","url":"https://出典URL","date":"YYYY-MM-DD"}]
+
+・顧問先らしき企業の情報のみ抽出する
+・情報が見つからない場合は空配列 [] を返すこと
+・JSONの配列のみ返すこと`,[]);
+      const d=parseJSON(toStr(r));
+      if(Array.isArray(d)) clientNews=d;
+    }
+  }catch(e){console.warn('④client',e);}
+
+  // 全セクション完了（部分失敗でも保存）
+  const errors=[];
+  if(!newsItems.length) errors.push('ニュース');
+  if(!topic.title) errors.push('労務トピック');
+  if(!icebreakers.length) errors.push('アイスブレイク');
+  if(!laborProposal.hook) errors.push('提案ストーリー');
+
+  const issue={
+    date:today,
+    newsItems:newsItems.length?newsItems:[{tag:'エラー',headline:'ニュース生成に失敗しました',body:'「今日の号を再生成」ボタンを押してください。',scale:'大手'}],
+    topic:topic.title?topic:{title:'労務トピック生成失敗',emoji:'⚠️',simpleExplain:'再生成してください',points:['再生成ボタンをお試しください']},
+    icebreakers:icebreakers.length?icebreakers:[],
+    laborProposal:laborProposal.hook?laborProposal:{},
+    clientNews,
+    errors
+  };
+  upsert(issue);
+  if(errors.length){
+    showIssue(today);
+    const mn=document.getElementById('mn');
+    const notice=document.createElement('div');
+    notice.style.cssText='background:#FEF3C7;border:2px solid #FDE68A;border-radius:12px;padding:14px 18px;margin:0 26px 20px;font-size:16px;color:#92400E;';
+    notice.innerHTML=`⚠️ 一部のセクションの生成に失敗しました（${errors.join('・')}）。「今日の号を再生成」で再試行してください。`;
+    mn.querySelector('.content')?.prepend(notice);
+  } else {
+    showIssue(today);
+  }
+  }catch(fatalErr){
+    console.error('[Newsletter] fatal error in generateToday:', fatalErr);
+    document.getElementById('mn').innerHTML=`
+      <div class="s-empty">
+        <div style="font-size:32px">⚠️</div>
+        <p style="margin:12px 0 6px;font-weight:600">生成中にエラーが発生しました</p>
+        <p style="font-size:13px;color:var(--txl);margin-bottom:16px">${String(fatalErr)}</p>
+        <button onclick="regenToday()" style="background:var(--or);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:15px;cursor:pointer;font-weight:600">再試行する</button>
+      </div>`;
+  }finally{
+    generating=false;
+  }
+}
+
+(function(){
+  // スケジュールタスクが埋め込んだ週次データを先にlocalStorageへ注入
+  if(WEEKLY_ISSUE_DATA && WEEKLY_ISSUE_DATA.date){
+    if(!load().find(x=>x.date===WEEKLY_ISSUE_DATA.date)){
+      upsert(WEEKLY_ISSUE_DATA);
+      console.log('[Newsletter] 週次自動生成データを読み込みました:', WEEKLY_ISSUE_DATA.date);
+    }
+  }
+  const list=load();renderSidebar();
+  const today=todayStr();
+  if(list.length){activeDate=list[0].date;renderSidebar();showIssue(list[0].date);}
+  // 今週の号がなければ自動生成を試みる（スケジュールタスク未実行時のフォールバック）
+  if(!list.find(x=>x.date===today)){
+    setTimeout(()=>generateToday(),400);
+  }
+})();
+</script>
+</body>
+</html>
